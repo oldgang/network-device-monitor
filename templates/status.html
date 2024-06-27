@@ -43,6 +43,27 @@
     socket.on('statusUpdate', function (data) {
         var devices = JSON.parse(data);
         console.log(devices);
+        var host;
+        var output;
+        var status;
+        for (const key in devices) {
+            host = key;
+            device = devices[key];
+            output = device['output']
+            status = device['status']
+            console.log(host + ' ' + status)
+            var statusDiv = document.querySelector('.status');
+            var id = host.replace(/\./g, '-');
+            if (document.getElementById(id) !== null) {
+                var statusElement = document.getElementById(id);
+                statusElement.innerHTML = host + ' ' + status +  ' ' + output;
+                continue;
+            }
+            var statusElement = document.createElement('div');
+            statusElement.setAttribute('id', id);
+            statusElement.innerHTML = host + ' ' + status + ' ' + output;
+            statusDiv.appendChild(statusElement);
+        }
         socket.emit('clientIsActive');
     });
 </script>

@@ -36,7 +36,6 @@ def handleClientActivity():
     room = request.sid
     if room in activeRooms:
         activeRooms[room] = time.time()
-        print(f'{room} is active')
 
 @socketio.on('clientDisconnect')
 def handleDisconnect(jsonData):
