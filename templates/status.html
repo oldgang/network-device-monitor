@@ -1,25 +1,49 @@
 {% extends 'base.html' %}
 
+{% block title %}Status monitor{% endblock %}
+
+{% block header %}
+<div class="container text-center">
+  <h1>Status monitor</h1>
+</div>
+{% endblock %}
+
 {% block content %}
-  <div class="container">
-    <div class="device"></div>
+  <div class="container text-center">
+    <div class="row">
+        <input type="text" class='row' placeholder="Enter IP Addresses separated by spacebar"/>
+        <div class='row'>
+            <div class='col'></div>
+            <button id='submit' class='col btn btn-primary'>Submit</button>
+            <div class='col'></div>
+        </div>
+    </div>
+    <div class="status">
+    </div>
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script type="text/javascript" charset="utf-8">
     var socket = io();
+    var submitButton = document.getElementById('submit');
     socket.on('connect', function() {
         socket.emit('clientConnect', {data: 'I\'m connected!'});
     });
     socket.on('disconnect', function() {
         socket.emit('clientDisconnect', {data: 'I\'m disconnected!'});
     });
-    socket.on('serverConnect', function(data) {
-        console.log('serverConnect, sid = ' + data);
+    socket.on('serverConnectionEstablished', function(data) {
+        console.log('serverConnectionEstablished, sid = ' + data);
     });
+    submitButton.onclick = function() {
+        var ipAddresses = document.querySelector('input').value;
+        document.querySelector('input').value = '';
+        socket.emit('hostsToPing', {data: ipAddresses});
+    };
     socket.on('statusUpdate', function (data) {
         var devices = JSON.parse(data);
         console.log(devices);
+        socket.emit('clientIsActive');
     });
 </script>
 
