@@ -1,10 +1,9 @@
-from flask import Flask, url_for, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request
 from re import findall
-from subprocess import Popen, PIPE, run
-from flask_socketio import SocketIO, join_room, leave_room, send, emit
+from subprocess import Popen, PIPE
+from flask_socketio import SocketIO, join_room, leave_room, emit
 import time
 import json
-import threading
 
 
 app = Flask(__name__)
@@ -49,10 +48,15 @@ def handleDisconnect(jsonData):
 def handlePing(jsonData):
     room = request.sid
     hosts = jsonData['data'].split(' ')
+    if hosts is None or hosts == ['']:
+        devices = {}
+        emit('statusUpdate', json.dumps(devices), to=room)
+        activeRooms.pop(room, None)
+        leave_room(room)
+        return
     print(f'pinging {hosts} for {room}')
     pingCount = 1
     devices = {}
-    lastPing = time.time()
     while room in list(activeRooms):
         if (time.time() - activeRooms[room] > 1 or activeRooms[room] == 0):
             for host in hosts:

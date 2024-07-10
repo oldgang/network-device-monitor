@@ -39,10 +39,15 @@
         var ipAddresses = document.querySelector('input').value;
         document.querySelector('input').value = '';
         socket.emit('hostsToPing', {data: ipAddresses});
+        document.getElementById('submit').disabled = true;
     };
     socket.on('statusUpdate', function (data) {
         var devices = JSON.parse(data);
+        var statusDiv = document.querySelector('.status');
         console.log(devices);
+        if (devices === null) {
+            return;
+        }
         var host;
         var output;
         var status;
@@ -52,7 +57,7 @@
             output = device['output']
             status = device['status']
             console.log(host + ' ' + status)
-            var statusDiv = document.querySelector('.status');
+            statusDiv = document.querySelector('.status');
             var id = host.replace(/\./g, '-');
             if (document.getElementById(id) !== null) {
                 var statusElement = document.getElementById(id);
