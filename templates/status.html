@@ -51,25 +51,23 @@
             return;
         }
         var host;
-        var output;
+        var outputDetailed;
         var status;
         for (const key in devices) {
             host = key;
             device = devices[key];
-            output = device['output']
+            outputDetailed = device['output']
             status = device['status']
-            console.log(host + ' ' + status)
+            var outputBrief = outputDetailed.split(" ").slice(0,5).join(" ")
             statusDiv = document.querySelector('.status');
             var id = host.replace(/\./g, '-');
-            if (document.getElementById(id) !== null) {
-                var statusElement = document.getElementById(id);
-                statusElement.innerHTML = output;
-                continue;
+            if (document.getElementById(id) === null) {
+                var statusElement = document.createElement('div');
+                statusElement.setAttribute('id', id);
+                statusDiv.appendChild(statusElement);
             }
-            var statusElement = document.createElement('div');
-            statusElement.setAttribute('id', id);
-            statusElement.innerHTML =  output;
-            statusDiv.appendChild(statusElement);
+            statusElement = document.getElementById(id);
+            statusElement.innerHTML = outputBrief;
         }
         socket.emit('clientIsActive');
     });

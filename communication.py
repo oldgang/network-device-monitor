@@ -6,6 +6,7 @@ def ping(host, pingCount, timeoutMiliseconds='500'):
     output = Popen(["fping", host, '-c', pingCount, '-t', timeoutMiliseconds], stdout=PIPE)
     output.wait()
     stdout = output.stdout.read().decode('utf-8')
+    # print(f"\n\n{stdout}\n\n")
     status = findall(r'64 bytes', stdout)
     if status:
         result = 'UP'
