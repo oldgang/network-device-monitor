@@ -50,13 +50,10 @@
         if (devices === null) {
             return;
         }
-        var host;
-        var outputDetailed;
-        var status;
         for (const key in devices) {
-            host = key;
-            device = devices[key];
-            outputDetailed = device['output']
+            let host = key;
+            let device = devices[key];
+            let outputDetailed = device['output']
             status = device['status']
             var outputBrief = outputDetailed.split(" ").slice(0,5).join(" ")
             statusDiv = document.querySelector('.status');
