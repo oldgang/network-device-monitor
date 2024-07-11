@@ -38,8 +38,10 @@
     submitButton.onclick = function() {
         var ipAddresses = document.querySelector('input').value;
         document.querySelector('input').value = '';
+        if (ipAddresses === '') {
+            return;
+        }
         socket.emit('hostsToPing', {data: ipAddresses});
-        document.getElementById('submit').disabled = true;
     };
     socket.on('statusUpdate', function (data) {
         var devices = JSON.parse(data);
@@ -61,12 +63,12 @@
             var id = host.replace(/\./g, '-');
             if (document.getElementById(id) !== null) {
                 var statusElement = document.getElementById(id);
-                statusElement.innerHTML = host + ' ' + status +  ' ' + output;
+                statusElement.innerHTML = output;
                 continue;
             }
             var statusElement = document.createElement('div');
             statusElement.setAttribute('id', id);
-            statusElement.innerHTML = host + ' ' + status + ' ' + output;
+            statusElement.innerHTML =  output;
             statusDiv.appendChild(statusElement);
         }
         socket.emit('clientIsActive');

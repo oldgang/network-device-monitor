@@ -1,26 +1,13 @@
 from flask import Flask, render_template, request
-from re import findall
-from subprocess import Popen, PIPE
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import time
 import json
+from communication import ping, ping_multiple
 
 
 app = Flask(__name__)
 socketio = SocketIO(app, logger=True, engineio_logger=True)
 activeRooms = {}
-
-def ping(host, pingCount, timeoutMiliseconds='500'):
-    pingCount = str(pingCount)
-    output = Popen(["fping", host, '-c', pingCount, '-t', timeoutMiliseconds], stdout=PIPE)
-    output.wait()
-    stdout = output.stdout.read().decode('utf-8')
-    status = findall(r'64 bytes', stdout)
-    if status:
-        result = 'UP'
-    else:
-        result = 'DOWN'
-    return [stdout, result]
 
 @socketio.on('clientConnect')
 def handleConnect(jsonData):
@@ -60,9 +47,14 @@ def handlePing(jsonData):
     while room in list(activeRooms):
         if (time.time() - activeRooms[room] > 1 or activeRooms[room] == 0):
             for host in hosts:
-                probeHost = ping(host, pingCount)
-                output = probeHost[0]
-                status = probeHost[1]
+                pingResult = ping(host, pingCount)
+                output = pingResult[0]
+                status = pingResult[1]
+                if ': [0], 64 bytes,' in output:
+                    output = ': '.join(output.split(': [0], 64 bytes,'))
+                else:
+                    output = f'{host}: unreachable'
+                    
                 devices[host] = {
                         'output': output,
                         'status': status
@@ -84,7 +76,7 @@ def status():
 
 if __name__ == '__main__':
     app.run(app)
-
+    # ping_multiple(['10.1.0.1', '10.1.0.2'], 5)
 
 
 
